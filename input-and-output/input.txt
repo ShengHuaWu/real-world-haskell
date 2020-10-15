@@ -2,5 +2,6 @@ Test Input
 I like Haskell
 Haskell is great
 I/O is fun
+Try something else
 
 123456789

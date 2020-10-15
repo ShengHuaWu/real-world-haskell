@@ -17,11 +17,26 @@ mainloop inHandle outHandle = do
                 hPutStrLn outHandle $ toUpper <$> line
                 mainloop inHandle outHandle
 
+-- Use `hGetContents` to obtain the text from the input file.
+-- Must not close the `inHandle` until we have finished consuming its results via `hGetContents`.
+mainloop1 :: Handle -> Handle -> IO ()
+mainloop1 inHandle outHandle = do
+    contents <- hGetContents inHandle -- The `contents` is evaluated lazily.
+    hPutStrLn outHandle $ toUpper <$> contents
+
+{-  Use `readFile` and `writeFile` to simplify the code.
+    They will open and close the file handle under the hood. -}
+readAndWrite :: IO ()
+readAndWrite = do
+    contents <- readFile "/Users/sw819i/Development/Private/real-world-haskell/input-and-output/input.txt"
+    writeFile "/Users/sw819i/Development/Private/real-world-haskell/input-and-output/output.txt" $ toUpper <$> contents
+
 {- `input.txt` should exist beforehand.
     Use absolute paths for both of `input.txt` and `output.txt`-}
 main = do
-    inHandle <- openFile "/Users/sw819i/Development/Private/real-world-haskell/input-and-output/input.txt" ReadMode
-    outHandle <- openFile "/Users/sw819i/Development/Private/real-world-haskell/input-and-output/output.txt" WriteMode
-    mainloop inHandle outHandle
-    hClose inHandle
-    hClose outHandle
+    -- inHandle <- openFile "/Users/sw819i/Development/Private/real-world-haskell/input-and-output/input.txt" ReadMode
+    -- outHandle <- openFile "/Users/sw819i/Development/Private/real-world-haskell/input-and-output/output.txt" WriteMode
+    -- mainloop1 inHandle outHandle
+    -- hClose inHandle
+    -- hClose outHandle
+    readAndWrite
