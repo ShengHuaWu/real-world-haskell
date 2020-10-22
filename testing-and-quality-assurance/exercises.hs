@@ -36,18 +36,22 @@ prop_append xs ys =
     not (null ys) ==>
         head (qsort (xs ++ ys)) == min (minimum xs) (minimum ys)
 
+-- After sorting, the output should be ordered.
 ordered :: Ord a => [a] -> Bool
 ordered []  = True
 ordered [x] = True
 ordered (x:y:xs) = x <= y && ordered (y:xs)
 
--- After sorting, the output should be ordered.
 prop_ordered :: Ord a => [a] -> Bool
 prop_ordered = ordered . qsort
 
+-- After sorting, the permutation should not change
 permutation :: Ord a => [a] -> [a] -> Bool
 permutation xs ys = null (xs \\ ys) && null (ys \\ xs)
 
--- After sorting, the permutation should not change
 prop_permutation :: Ord a => [a] -> Bool
 prop_permutation xs = permutation xs (qsort xs)
+
+-- Compare with the `sort` function in the standard list library. (aka model-based testing)
+prop_sort_model :: Ord a => [a] -> Bool
+prop_sort_model xs = sort xs == qsort xs
