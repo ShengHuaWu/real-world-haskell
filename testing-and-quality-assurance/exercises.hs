@@ -45,7 +45,10 @@ ordered (x:y:xs) = x <= y && ordered (y:xs)
 prop_ordered :: Ord a => [a] -> Bool
 prop_ordered = ordered . qsort
 
--- After sorting, the permutation should not change
+{- 
+    After sorting, the permutation should not change.
+    The `\\` operator is used to distinguish the differences of two list.
+-}
 permutation :: Ord a => [a] -> [a] -> Bool
 permutation xs ys = null (xs \\ ys) && null (ys \\ xs)
 
@@ -55,3 +58,30 @@ prop_permutation xs = permutation xs (qsort xs)
 -- Compare with the `sort` function in the standard list library. (aka model-based testing)
 prop_sort_model :: Ord a => [a] -> Bool
 prop_sort_model xs = sort xs == qsort xs
+
+-- Generating test data
+data Ternary
+    = Yes
+    | No
+    | Unknown
+    deriving (Eq,Show)
+
+instance Arbitrary Ternary where
+    arbitrary = elements [Yes, No, Unknown] -- the `elements` takes a list of values, and returns a generator of random values from that list.
+
+data Doc = Empty
+         | Char Char
+         | Text String
+         | Line
+         | Concat Doc Doc
+         | Union Doc Doc
+         deriving (Show,Eq)
+
+instance Arbitrary Doc where
+    arbitrary = oneof [ return Empty
+                      , Char <$> arbitrary
+                      , Text <$> arbitrary
+                      , return Line
+                      , Concat <$> arbitrary <*> arbitrary
+                      , Union <$> arbitrary <*> arbitrary ]
+                      
