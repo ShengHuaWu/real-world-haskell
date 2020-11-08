@@ -18,7 +18,7 @@ module HandleIO (
 import Control.Monad.Trans (MonadIO(..))
 import System.IO (Handle, IOMode(..))
 import qualified System.IO -- `qualified` means we can only use the interfaces with the prefix of the module, for example, `System.IO.hClose` instead of `hClose`
-import qualified System.Directory
+import System.Directory (removeFile)
 
 {- 
     This is a technique to wrap an `IO` action in another monad, which is similar to the following in Swift.
@@ -27,6 +27,8 @@ import qualified System.Directory
         let run: ((A) -> Void) -> Void
     }
     ```
+    The disadvantage of wrapping `IO` in another monad is that we're still tied to a concrete implementation. 
+    If we want to swap `HandleIO` for some other monad, we must change the type of every action that uses `HandleIO`.
 -}
 newtype HandleIO a = HandleIO { runHandleIO :: IO a } deriving (Functor, Applicative, Monad)
 
@@ -52,4 +54,4 @@ instance MonadIO HandleIO where
 tidyHello :: FilePath -> HandleIO ()
 tidyHello path = do
     safeHello path
-    liftIO (System.Directory.removeFile path)
+    liftIO (removeFile path)
